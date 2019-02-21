@@ -149,8 +149,8 @@ for i_episode in range(X):
         observation, reward, done, info = env.step(action)
         new_state = state_from_space(observation, action)
 
-        print("Old: "+str(old_state)+", reward: "+str(q.get_reward(old_state)))
-        print("New: "+str(new_state)+", reward: "+str(q.get_reward(new_state)))
+        # print("Old: "+str(old_state)+", reward: "+str(q.get_reward(old_state)))
+        # print("New: "+str(new_state)+", reward: "+str(q.get_reward(new_state)))
 
         # Q-learning equation
         best_new_state = State(new_state.states, max_a(new_state))
@@ -159,7 +159,7 @@ for i_episode in range(X):
         # print("Best: "+str(best_new_state)+", reward: "+str(best_new_reward))
         new_reward = old_reward + alfa * (reward + gamma * best_new_reward - old_reward)
         q.put(old_state, float(new_reward))
-        print("old reward: "+str(old_reward)+ ", new reward: "+str(q.get_reward(old_state)))
+        # print("old reward: "+str(old_reward)+ ", new reward: "+str(q.get_reward(old_state)))
 
         # Updating state
         old_state = new_state.copy()
