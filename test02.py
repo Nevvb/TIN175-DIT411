@@ -18,12 +18,12 @@ actions = env.action_space
 action_space = [0, 1] # TODO Fix (generic) action space
 print("actions: "+str(actions))
 
-epsilon = 0.2   # Epsilon greedy probability
+epsilon = 0.1   # Epsilon greedy probability
 alpha = 0.5     # Learning rate
-gamma = 0.75    # Discount factor
+gamma = 0.5     # Discount factor
 
 def max_a(state):
-    best_reward = 0.0
+    best_reward = -1000000.0
     best_actions = []
     if state in q:
         for action, reward in q[state].items():
@@ -54,19 +54,21 @@ def state_from_space(space):
 
 times = []
 # Running X episodes
-X = 1000
+X = 10000
 for i_episode in range(X):
 
     # Resetting environment
     observation = env.reset()
     old_state = state_from_space(observation)
-    epsilon *= 0.95
-    print(f'episode {i_episode}')
-    print(f'epsilon={epsilon}')
+    # epsilon *= 0.95
+    if i_episode % 100 == 0:
+        print(f'episode {i_episode}')
+    # print(f'epsilon={epsilon}')
 
     # Running through an episode
     for t in range(1000):
-        # env.render()
+        if i_episode % 100 == 0:
+            env.render()
 
         # Select action
         
@@ -100,7 +102,7 @@ for i_episode in range(X):
 
         # Aborting episode if done
         if done:
-            print(f'Episode finished after {t + 1} timesteps')
+            # print(f'Episode finished after {t + 1} timesteps')
             break
     times.append(t + 1)
 plt.plot(times)
