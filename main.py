@@ -4,13 +4,14 @@ import numpy as np
 
 print("Gym:", gym.__version__)
 
-env_name = "Taxi-v2"
-#env_name = "Breakout-v0"
+#env_name = "Taxi-v2"
+env_name = "Breakout-v0"
 env = gym.make(env_name).env
 print("Observation space:", env.observation_space)
 print("Action space:", env.action_space)
 
-q_table = np.zeros([env.observation_space.n, env.action_space.n])
+#q_table = np.zeros([env.observation_space.n, env.action_space.n])
+q_table = np.zeros([300, env.action_space.n])
 
 #Hyperparameters
 alpha = 0.1     #Learning rate
@@ -19,18 +20,20 @@ epsilon = 0.1   #Rate of exploration
 
 #For plotting metrics
 all_epochs = []
-all_penalties = []
 
-num_episodes = 20
+
+num_episodes = 2000
+all_rewards = np.zeros([num_episodes])
 
 for ep in range(num_episodes):
+    i = 0
     state = env.reset()
 
-    epochs, penalties, reward = 0, 0, 0
+    epochs, penalties, reward, tot_reward = 0, 0, 0, 0
 
     done = False
 
-    for  i in range(100):
+    while not done:
         #Explore
         if random.uniform(0, 1) < epsilon:
             action = env.action_space.sample()
@@ -52,12 +55,15 @@ for ep in range(num_episodes):
         state = next_state
 
         epochs += 1
-        env.render()
-        print(state)
+        #env.render()
+        tot_reward += reward
         
         
         if done:
-            print('Episode finished after {} timesteps' .format(i+1))
+            print('Episode finished after {} timesteps' .format(epochs+1))
+            all_rewards[i] = tot_reward
+            print("all rewards {}".format(all_rewards))
             break
+    i += 1
 
 print('success')
