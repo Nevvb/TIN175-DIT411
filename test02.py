@@ -14,7 +14,7 @@ class State:
     def __hash__(self):
         h = 0;
         for value in self.states:
-            h = h*31 + value
+            h = h*31 + value*10
         h = h*37 + self.action
         return int(round(h))
 
@@ -25,11 +25,35 @@ class State:
         new_state = State(self.states, self.action)
         return new_state
 
+# --- Q object
+class Q:
+    def __init__(self):
+        self.q = dict()
+
+    def put(self, state, reward):
+        self.q[state] = reward
+
+    def get_reward(self, state):
+        reward = 0
+        if state in self.q:
+            reward = self.q[state]
+            print("Got reward!!!: "+str(reward)+", state: "+str(state))
+        else:
+            self.q[state] = 0
+        return reward
+
+    def contains(self, state):
+        if state in self.q:
+            return True
+        return False
+
 # --- Specific cartpole q-learning
 
 env = gym.make('CartPole-v0')
 
-q = dict()
+# q = dict()
+
+q = Q()
 
 size_up = 10
 # high = env.observation_space.high
@@ -66,16 +90,19 @@ def max_a(state):
     best_action = actions.sample()
     for i in range(actions.n):
         s.action = i
-        if s in q and q[s] > reward:
+        if q.contains(s) and q.get_reward(s) > reward:
             reward = q[s]
             best_action = i
     return best_action
 
-def get_reward(state):
-    reward = 0
-    if state in q:
-        reward = q[state]
-    return reward
+# def get_reward(state):
+#     reward = 0
+#     if state in q:
+#         reward = q[state]
+#         print("Got reward!!!: "+str(reward)+", state: "+str(state))
+#     else:
+#         q[state] = 0
+#     return reward
 
 def state_from_space(space, action):
     l = list()
@@ -98,6 +125,7 @@ for i_episode in range(X):
     observation = env.reset()
     old_state = state_from_space(observation, actions.sample())
     new_state = old_state.copy()
+    # print("hash: "+str(old_state.__hash__())+ ", hash2: "+str(old_state.__hash__()))
 
     # Running through an episode
     for t in range(100):
@@ -117,16 +145,17 @@ for i_episode in range(X):
         observation, reward, done, info = env.step(action)
         new_state = state_from_space(observation, action)
 
-        print("Old: "+str(old_state)+", reward: "+str(get_reward(old_state)))
-        print("New: "+str(new_state)+", reward: "+str(get_reward(new_state)))
+        print("Old: "+str(old_state)+", reward: "+str(q.get_reward(old_state)))
+        print("New: "+str(new_state)+", reward: "+str(q.get_reward(new_state)))
 
         # Q-learning equation
         best_new_state = State(new_state.states, max_a(new_state))
-        best_new_reward = get_reward(best_new_state)
-        old_reward = get_reward(old_state)
+        best_new_reward = q.get_reward(best_new_state)
+        old_reward = q.get_reward(old_state)
         # print("Best: "+str(best_new_state)+", reward: "+str(best_new_reward))
-        q[old_state] = old_reward + alfa * (reward + gamma * best_new_reward - old_reward)
-        print("old reward: "+str(old_reward)+ ", new reward: "+str(q[old_state])+", vs function 'get_reward': "+str(get_reward(old_state)))
+        new_reward = old_reward + alfa * (reward + gamma * best_new_reward - old_reward)
+        q.put(old_state, float(new_reward))
+        print("old reward: "+str(old_reward)+ ", new reward: "+str(q.get_reward(old_state)))
 
         # Updating state
         old_state = new_state.copy()
