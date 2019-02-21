@@ -81,8 +81,8 @@ actions = env.action_space
 # print("min: "+str(low))
 print("actions: "+str(actions))
 
-epsilon = 0.9   # Epsilon greedy probability
-alfa = 0.5      # Learning rate
+epsilon = 0.01  # Epsilon greedy probability
+alfa = 0.02     # Learning rate
 gamma = 0.8     # Discount factor
 
 def max_a(state):
