@@ -3,6 +3,7 @@ import gym
 import random
 
 import numpy as np
+import matplotlib.pyplot as plt
 from gym import spaces
 
 # --- Specific cartpole q-learning
@@ -17,9 +18,9 @@ actions = env.action_space
 action_space = [0, 1]
 print("actions: "+str(actions))
 
-epsilon = 0.1   # Epsilon greedy probability
-alpha = 1.0     # Learning rate
-gamma = 0.94    # Discount factor
+epsilon = 0.2   # Epsilon greedy probability
+alpha = 0.5     # Learning rate
+gamma = 0.75    # Discount factor
 
 def max_a(state):
     best_reward = 0.0
@@ -41,11 +42,17 @@ def max_a(state):
         return random.randint(0, len(action_space) - 1)
 
 def state_from_space(space):
-    # print(np.ndarray.round(space, 1))
-    return str(np.ndarray.round(10*space, 0)[1:3])
+    return_array = []
+    for i in range(3):
+        for j in range(3):
+            for k in range(3):
+                # [1:4] because position is irrelevant
+                return_array.append(str((np.rint(1000 * space) - [0, 1, 1, 1] + [0, i, j, k])[1:4].astype(int)))
+    return str(np.rint(100 * space)[1:4].astype(int))
 
 # sys.exit()
 
+times = []
 # Running X episodes
 X = 1000
 for i_episode in range(X):
@@ -53,34 +60,38 @@ for i_episode in range(X):
     # Resetting environment
     observation = env.reset()
     old_state = state_from_space(observation)
-    epsilon *= 0.8
+    epsilon *= 0.95
+    print(f'episode {i_episode}')
     print(f'epsilon={epsilon}')
 
     # Running through an episode
     for t in range(1000):
-        env.render()
+        # env.render()
 
         # Select action
-        action = max_a(old_state)
+        
+        for state in old_state:
+            action = max_a(old_state)
         if random.random() < epsilon:
             action = env.action_space.sample()
 
         # Perform action, observe reward and new state
         observation, reward, done, info = env.step(action)
         reward = 1.0 - abs(4.0 * observation[2])
-        print(f'reward: {reward}')
+        # print(f'reward: {reward}')
         # if not old_state in q:
             # q[old_state] = dict()
             # for action in action_space: # TODO Same as above
                 # q[new_state][action] = 0.0
         new_state = state_from_space(observation)
+        # print(new_state)
         if not new_state in q:
             q[new_state] = dict()
             for action in action_space: # TODO Same as above
                 q[new_state][action] = 0.0
 
         # Q-learning equation
-        print(f'state size: {len(q)}')
+        # print(f'state size: {len(q)}')
         q[old_state][action] = (1 - alpha) * q[old_state][action] + alpha * (reward + gamma * q[new_state][max_a(new_state)])
         # print(q[old_state][action])
         
@@ -89,7 +100,10 @@ for i_episode in range(X):
 
         # Aborting episode if done
         if done:
-           print("Episode finished after {} timesteps".format(t+1))
-           break
-
+            print(f'Episode finished after {t + 1} timesteps')
+            times.append(t + 1)
+            break
+print(times)
+plt.plot(times)
+plt.show()
 sys.exit()
