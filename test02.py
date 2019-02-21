@@ -15,7 +15,7 @@ q = dict()
 
 size_up = 10
 actions = env.action_space
-action_space = [0, 1]
+action_space = [0, 1] # TODO Fix (generic) action space
 print("actions: "+str(actions))
 
 epsilon = 0.2   # Epsilon greedy probability
@@ -37,18 +37,18 @@ def max_a(state):
         return best_actions[action_chosen]
     else:
         q[state] = dict()
-        for action in action_space: # TODO Fix (generic) action space
+        for action in action_space:
             q[state][action] = 0.0
         return random.randint(0, len(action_space) - 1)
 
 def state_from_space(space):
-    return_array = []
-    for i in range(3):
-        for j in range(3):
-            for k in range(3):
-                # [1:4] because position is irrelevant
-                return_array.append(str((np.rint(1000 * space) - [0, 1, 1, 1] + [0, i, j, k])[1:4].astype(int)))
-    return str(np.rint(100 * space)[1:4].astype(int))
+    # return_array = []
+    # for i in range(3):
+    #     for j in range(3):
+    #         for k in range(3):
+    #             # [1:4] because position is irrelevant
+    #             return_array.append(str((np.rint(1000 * space) - [0, 1, 1, 1] + [0, i, j, k])[1:4].astype(int)))
+    return str(np.rint(10 * space)[1:4].astype(int))
 
 # sys.exit()
 
@@ -81,13 +81,13 @@ for i_episode in range(X):
         # print(f'reward: {reward}')
         # if not old_state in q:
             # q[old_state] = dict()
-            # for action in action_space: # TODO Same as above
+            # for action in action_space:
                 # q[new_state][action] = 0.0
         new_state = state_from_space(observation)
         # print(new_state)
         if not new_state in q:
             q[new_state] = dict()
-            for action in action_space: # TODO Same as above
+            for action in action_space:
                 q[new_state][action] = 0.0
 
         # Q-learning equation
@@ -101,9 +101,8 @@ for i_episode in range(X):
         # Aborting episode if done
         if done:
             print(f'Episode finished after {t + 1} timesteps')
-            times.append(t + 1)
             break
-print(times)
+    times.append(t + 1)
 plt.plot(times)
 plt.show()
 sys.exit()
