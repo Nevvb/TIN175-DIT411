@@ -1,5 +1,6 @@
 import sys
 import gym
+import random
 
 from gym import spaces
 
@@ -134,7 +135,10 @@ for i_episode in range(X):
         # print("old state reward: "+str(old_reward)+ ", new reward: "+str(q[old_state]))
 
         # Select action
-        action = max_a(old_state)
+        if random.random() < epsilon:
+            action = env.action_space.sample()
+        else:
+            action = max_a(old_state)
         # if old_state in q:
         #     print("in q!")
         #     action = q[old_state].action
