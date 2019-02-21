@@ -53,6 +53,8 @@ def state_from_space(space):
 # sys.exit()
 
 times = []
+avg_times = []
+max_times = []
 # Running X episodes
 X = 10000
 for i_episode in range(X):
@@ -60,10 +62,11 @@ for i_episode in range(X):
     # Resetting environment
     observation = env.reset()
     old_state = state_from_space(observation)
-    # epsilon *= 0.95
+    if i_episode % 1000 == 999:  
+        epsilon *= 0.5
+        print(f'epsilon={epsilon}')
     if i_episode % 100 == 0:
         print(f'episode {i_episode}')
-    # print(f'epsilon={epsilon}')
 
     # Running through an episode
     for t in range(1000):
@@ -104,7 +107,15 @@ for i_episode in range(X):
         if done:
             # print(f'Episode finished after {t + 1} timesteps')
             break
+    if i_episode % 100 == 0:
+        print(f'Episode finished after {t + 1} timesteps')
+    last_items = times[t - 999:t]
+    last_items.append(t + 1)
     times.append(t + 1)
+    avg_times.append(np.mean(last_items))
+    max_times.append(np.max(last_items))
 plt.plot(times)
+plt.plot(avg_times)
+plt.plot(max_times)
 plt.show()
 sys.exit()
