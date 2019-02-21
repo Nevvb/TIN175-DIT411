@@ -91,6 +91,8 @@ def max_a(state):
     best_action = actions.sample()
     for i in range(actions.n):
         s.action = i
+        if q.contains(s):
+            print(f'action ({i}) already tried in state ({s})')
         if q.contains(s) and q.get_reward(s) > reward:
             reward = q[s]
             best_action = i
@@ -162,7 +164,8 @@ for i_episode in range(X):
         # print("old reward: "+str(old_reward)+ ", new reward: "+str(q.get_reward(old_state)))
 
         # Updating state
-        old_state = new_state.copy()
+        old_state = new_state
+        # print(f'{q.q}\n')
 
         # Aborting episode if done
         if done:
