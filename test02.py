@@ -42,7 +42,7 @@ def max_a(state):
 
 def state_from_space(space):
     # print(np.ndarray.round(space, 1))
-    return str(np.ndarray.round(10*space, 0))
+    return str(np.ndarray.round(10*space, 0)[1:3])
 
 # sys.exit()
 
@@ -67,6 +67,8 @@ for i_episode in range(X):
 
         # Perform action, observe reward and new state
         observation, reward, done, info = env.step(action)
+        reward = 1.0 - abs(4.0 * observation[2])
+        print(f'reward: {reward}')
         # if not old_state in q:
             # q[old_state] = dict()
             # for action in action_space: # TODO Same as above
@@ -78,11 +80,7 @@ for i_episode in range(X):
                 q[new_state][action] = 0.0
 
         # Q-learning equation
-        print(len(q))
-        print(f'old: {q[old_state]}')
-        print(f'old value: {q[old_state][action]}')
-        print(f'best action in next state: {max_a(new_state)}')
-        print(f'new value: {q[new_state][max_a(new_state)]}')
+        print(f'state size: {len(q)}')
         q[old_state][action] = (1 - alpha) * q[old_state][action] + alpha * (reward + gamma * q[new_state][max_a(new_state)])
         # print(q[old_state][action])
         
