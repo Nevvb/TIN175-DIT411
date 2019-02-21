@@ -3,28 +3,21 @@ import gym
 
 from gym import spaces
 
-# --- Different environments
+# --- State class for q-learning
 
-# env = gym.make('CartPole-v0')
-# env = gym.make('MountainCar-v0')
-# env = gym.make('MsPacman-v0')
-# env = gym.make('LunarLander-v2')
-# env = gym.make('SpaceInvaders-v0')
-# env = gym.make('FrozenLake-v0')
+class State:
+    def __init__(self, state_list):
+        self.size = len(state_list)
+        self.states = state_list
 
-# --- Test code
+    def __hash__(self):
+        h = 0;
+        for value in states:
+            h = hash*31 + hash(value)
+        return h
 
-# print(env.action_space)
-# print(env.observation_space)
-# print(env.observation_space.high)
-# print(env.observation_space.low)
-
-# space = spaces.Discrete(8)
-# x = space.sample()
-# assert space.contains(x)
-# assert space.n == 8
-
-# sys.exit()
+    def __str__(self):
+        return "State: " + str(self.states)
 
 # --- Specific cartpole q-learning
 
@@ -34,8 +27,9 @@ q = dict()
 # for s in range(env.observation_space.n)
 #     for a in range(env.action_space.n)
 a = {1, 2, 3, 4}
-q[1] = "hej"
-print(q)
+b = State(a)
+# q[1] = "hej"
+print(b)
 
 sys.exit()
 
