@@ -14,11 +14,12 @@ q = dict()
 
 size_up = 10
 actions = env.action_space
+action_space = [0, 1]
 print("actions: "+str(actions))
 
 epsilon = 0.1   # Epsilon greedy probability
-alpha = 0.2     # Learning rate
-gamma = 0.5     # Discount factor
+alpha = 1.0     # Learning rate
+gamma = 0.94    # Discount factor
 
 def max_a(state):
     best_reward = 0.0
@@ -30,20 +31,18 @@ def max_a(state):
                 best_reward = reward
             elif reward == best_reward:
                 best_actions.append(action)
-        if best_reward != 0.0:
-            print(f'actions: {best_actions}, reward: {best_reward}')
         action_chosen = random.randint(0, len(best_actions) - 1)
         # print(f'action chosen: {best_actions[action_chosen]}')
         return best_actions[action_chosen]
     else:
         q[state] = dict()
-        for action in [0, 1]: # TODO Fix (generic) action space
+        for action in action_space: # TODO Fix (generic) action space
             q[state][action] = 0.0
-        return random.randint(0, 1)
+        return random.randint(0, len(action_space) - 1)
 
 def state_from_space(space):
     # print(np.ndarray.round(space, 1))
-    return str(np.ndarray.round(space, 1))
+    return str(np.ndarray.round(10*space, 0))
 
 # sys.exit()
 
@@ -54,28 +53,36 @@ for i_episode in range(X):
     # Resetting environment
     observation = env.reset()
     old_state = state_from_space(observation)
+    epsilon *= 0.8
+    print(f'epsilon={epsilon}')
 
     # Running through an episode
-    for t in range(100):
+    for t in range(1000):
         env.render()
 
         # Select action
+        action = max_a(old_state)
         if random.random() < epsilon:
             action = env.action_space.sample()
-        else:
-            action = max_a(old_state)
 
         # Perform action, observe reward and new state
         observation, reward, done, info = env.step(action)
-        if not old_state in q:
-            q[old_state] = dict()
+        # if not old_state in q:
+            # q[old_state] = dict()
+            # for action in action_space: # TODO Same as above
+                # q[new_state][action] = 0.0
         new_state = state_from_space(observation)
         if not new_state in q:
             q[new_state] = dict()
-            for action in [0, 1]: # TODO Same as above
+            for action in action_space: # TODO Same as above
                 q[new_state][action] = 0.0
 
         # Q-learning equation
+        print(len(q))
+        print(f'old: {q[old_state]}')
+        print(f'old value: {q[old_state][action]}')
+        print(f'best action in next state: {max_a(new_state)}')
+        print(f'new value: {q[new_state][max_a(new_state)]}')
         q[old_state][action] = (1 - alpha) * q[old_state][action] + alpha * (reward + gamma * q[new_state][max_a(new_state)])
         # print(q[old_state][action])
         
