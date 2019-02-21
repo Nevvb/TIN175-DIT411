@@ -12,11 +12,11 @@ print("Action space:", env.action_space)
 q_table = np.zeros([env.observation_space.n, env.action_space.n])
 
 #Hyperparameters
-alpha = 0.1
-gamma = 0.6
-epsilon = 0.1
+alpha = 0.1     #Learning rate
+gamma = 0.6     #Accumulated discount reward
+epsilon = 0.1   #Rate of exploration
 
-#for plotting metrcis
+#For plotting metrics
 all_epochs = []
 all_penalties = []
 
@@ -33,6 +33,7 @@ for ep in range(num_episodes):
         #Explore
         if random.uniform(0, 1) < epsilon:
             action = env.action_space.sample()
+        #Exploit
         else:
             action = np.argmax(q_table[state])
 
