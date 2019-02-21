@@ -5,6 +5,7 @@ import numpy as np
 print("Gym:", gym.__version__)
 
 env_name = "Taxi-v2"
+#env_name = "Breakout-v0"
 env = gym.make(env_name).env
 print("Observation space:", env.observation_space)
 print("Action space:", env.action_space)
