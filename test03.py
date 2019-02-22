@@ -25,56 +25,72 @@ gamma = 1.0         # Discount factor
 def max_a(state):
     reward = 0
     best_action = actions.sample()
-    s0 = state[:-1]
+    # s0 = state[:-1]
+    s = state
     for i in range(actions.n):
-        s = s0 + str(i)
-        if get_reward(s) > reward:
-            reward = get_reward(s)
-            best_action = get_action(s)
+        # s = s0 + str(i)
+        if get_reward(s, i) > reward:
+            reward = get_reward(s, i)
+            best_action = i
     #         print("Best action, state: "+s+", action: "+str(get_action(s))+", reward: "+str(get_reward(s)))
     #     else:
     #         print("Best action, state: "+s+", action: "+str(get_action(s)))
     # print("Best action - result: "+str(best_action))
     return best_action
 
-def get_reward(state):
+def get_reward(state, action):
     reward = 0
-    if state in q:
-        reward = q[state]
+    if state in q and action in q[state]:
+        reward = q[state][action]
+        # return reward
+        # else:
+        #     q[state] = dict()
+        #     q[state] = reward
         # print("Got reward!!!: "+str(reward)+", state: "+str(state))
+    # else:
+    #     q[state] = reward
     else:
-        q[state] = reward
+        if state not in q:
+            q[state] = dict()
+        q[state][action] = reward
     return reward
 
-def get_action(state):
-    action = int(state[-1:])
-    # print("Got action! "+str(action)+", state: "+str(state))
-    return action
+# def get_action(state):
+#     action = int(state[-1:])
+#     # print("Got action! "+str(action)+", state: "+str(state))
+#     return action
 
-def create_state(observation, action):
+def create_state(observation):
     s = ""
     for o in observation:
         n = size_up * o
         s = s + str(int(round(n))) + "_"
-    s = s + str(action)
+    # s = s + str(action)
     # print("Create state: "+s+", action: "+str(action))
     return s
+
+def save_reward(state, action, reward):
+    if state not in q:
+        q[state] = dict()
+    q[state][action] = reward
 
 
 # sys.exit()
 
 # Running X episodes
-X = 10000
+X = 200000
 for i_episode in range(X):
 
     # Resetting environment
     observation = env.reset()
-    old_state = create_state(observation, actions.sample())
+    old_state = create_state(observation)
     new_state = old_state
 
     # Running through an episode
-    for t in range(200):
-        env.render()
+    for t in range(1000):
+        # Speeding it up!
+        if i_episode % 100 == 0:
+            env.render()
 
         # print("old state reward: "+str(old_reward)+ ", new reward: "+str(q[old_state]))
 
@@ -90,19 +106,22 @@ for i_episode in range(X):
 
         # Perform action, observe reward and new state
         observation, reward, done, info = env.step(action)
-        new_state = create_state(observation, action)
+        # reward = 1.0 - abs(4.0 * observation[2])
+        new_state = create_state(observation)
 
-        # print("Old: "+str(old_state)+", reward: "+str(get_reward(old_state)))
+        # print("Old: "+str(old_state)+", reward: "+str(get_reward(old_state, action)))
         # print("New: "+str(new_state)+", reward: "+str(get_reward(new_state)))
 
         # Q-learning equation
-        best_new_state = create_state(observation, max_a(new_state))
-        best_new_reward = get_reward(best_new_state)
-        old_reward = get_reward(old_state)
+        # best_new_state = create_state(observation, max_a(new_state))
+        # best_new_reward = get_reward(best_new_state)
+        best_new_reward = get_reward(new_state, max_a(new_state))
+        old_reward = get_reward(old_state, action)
         # print("Best: "+str(best_new_state)+", reward: "+str(best_new_reward))
         new_reward = old_reward + alfa * (reward + gamma * best_new_reward - old_reward)
-        q[old_state] = new_reward
-        # print("old reward: "+str(old_reward)+ ", new reward: "+str(get_reward(old_state)))
+        # q[old_state] = new_reward
+        save_reward(old_state, action, new_reward)
+        # print("old state: "+str(old_state)+", old reward: "+str(old_reward)+ ", new reward: "+str(get_reward(old_state, action)))
 
         # Updating state
         old_state = new_state
