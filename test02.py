@@ -20,7 +20,7 @@ print("actions: "+str(actions))
 
 epsilon = 1.0   # Epsilon greedy probability
 alpha = 0.1     # Learning rate
-gamma = 0.5     # Discount factor
+gamma = 0.2     # Discount factor
 
 def max_a(state):
     best_reward = -1.0
