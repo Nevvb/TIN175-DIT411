@@ -146,6 +146,8 @@ for i_episode in range(X):
     # print(f'last_items: {last_items}, list size: {len(last_items)}')
     times.append(t + 1)
     mean = np.mean(last_items)
+    max_ = np.max(last_items)
+    min_ = np.min(last_items)
     if i_episode % draw_interval == 0:
         print(f'Episode finished after {t + 1} timesteps')
         print(f'Mean score: {mean}')
@@ -158,9 +160,11 @@ for i_episode in range(X):
     else:
         success_counter = 0
     avg_times.append(mean)
-    max_times.append(np.max(last_items))
-# plt.plot(times)
+    max_times.append(max_)
+    min_times.append(min_)
+plt.plot(times)
 plt.plot(avg_times)
-# plt.plot(max_times)
+plt.plot(max_times)
+plt.plot(min_times)
 plt.show()
 sys.exit()
