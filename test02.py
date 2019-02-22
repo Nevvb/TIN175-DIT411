@@ -122,7 +122,6 @@ for i_episode in range(X):
     max_times.append(np.max(last_items))
 # plt.plot(times)
 plt.plot(avg_times)
-print(list(zip(times, avg_times)))
 # plt.plot(max_times)
 plt.show()
 sys.exit()
