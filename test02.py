@@ -66,7 +66,7 @@ for i_episode in range(X):
         epsilon *= 0.5
         print(f'epsilon={epsilon}')
     if i_episode % 100 == 0:
-        print(f'episode {i_episode}')
+        print(f'Episode {i_episode}')
 
     # Running through an episode
     for t in range(1000):
@@ -107,16 +107,22 @@ for i_episode in range(X):
         if done:
             # print(f'Episode finished after {t + 1} timesteps')
             break
+    last_items = times[i_episode - 99:i_episode]
+    last_items.append(t + 1)
+    # print(f'last_items: {last_items}, list size: {len(last_items)}')
+    times.append(t + 1)
+    mean = np.mean(last_items)
     if i_episode % 100 == 0:
         print(f'Episode finished after {t + 1} timesteps')
-    last_items = times[t - 999:t]
-    last_items.append(t + 1)
-    times.append(t + 1)
-    avg_times.append(np.mean(last_items))
+        print(f'Mean score: {mean}')
+    if mean >= 195.0:
+        print(f'Success! After {i_episode} episodes')
+        break
+    avg_times.append(mean)
     max_times.append(np.max(last_items))
 # plt.plot(times)
 plt.plot(avg_times)
-print(zip(times, avg_times))
+print(list(zip(times, avg_times)))
 # plt.plot(max_times)
 plt.show()
 sys.exit()
