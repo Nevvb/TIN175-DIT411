@@ -41,6 +41,26 @@ def max_a(state):
             q[state][action] = 0.0
         return random.randint(0, len(action_space) - 1)
 
+def prob_a(state):
+    if state in q:
+        action_probs = {}
+        prob_sum = 0
+        for action, reward in q[state].items():
+            prob = np.exp(reward)
+            action_probs[action] = prob
+            prob_sum += prob
+        random_prob = random.random() * prob_sum
+        for action, prob in action_probs.items():
+            random_prob -= prob
+            if random_prob <= 0:
+                return action
+        return -1 # something went wrong here
+    else:
+        q[state] = dict()
+        for action in action_space:
+            q[state][action] = 0.0
+        return random.randint(0, len(action_space) - 1)
+
 def state_from_space(space):
     # return_array = []
     # for i in range(3):
