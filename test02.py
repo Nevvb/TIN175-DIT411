@@ -19,8 +19,8 @@ action_space = [0, 1] # TODO Fix (generic) action space
 print("actions: "+str(actions))
 
 epsilon = 1.0   # Epsilon greedy probability
-alpha = 0.1     # Learning rate
-gamma = 0.2     # Discount factor
+alpha = 0.2     # Learning rate
+gamma = 0.5     # Discount factor
 
 def max_a(state):
     best_reward = -1.0
@@ -153,7 +153,7 @@ for i_episode in range(X):
         print(f'Success! After {i_episode} episodes')
         print(f'Mean score: {mean}')
         success_counter += 1
-        if success_counter >= 10:
+        if success_counter >= 20:
             break
     else:
         success_counter = 0
