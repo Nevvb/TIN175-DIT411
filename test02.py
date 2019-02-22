@@ -23,7 +23,7 @@ alpha = 0.1     # Learning rate
 gamma = 0.5     # Discount factor
 
 def max_a(state):
-    best_reward = 0.0
+    best_reward = -1.0
     best_actions = []
     if state in q:
         for action, reward in q[state].items():
@@ -119,7 +119,7 @@ for i_episode in range(X):
             break
 
     # Q-learning equation
-    reward = (t / 200.0) # - 1.0
+    reward = ((t + 1) / 200) - 1
     for current_state, actions in state_actions_taken.items():
         for action in actions:
             new_state = next_states[current_state][action]
@@ -131,7 +131,7 @@ for i_episode in range(X):
                 q[new_state] = {}
                 for possible_action in action_space:
                     q[new_state][possible_action] = 0.0
-            q[current_state][action] = (1 - alpha) * q[current_state][action] + alpha * (reward + gamma * q[new_state][max_a(new_state)])
+            q[current_state][action] = (1 - alpha) * q[current_state][action] + alpha * ((1 - gamma) * reward + gamma * q[new_state][max_a(new_state)])
             # q[current_state][action] += reward
     last_items = times[i_episode - 99:i_episode]
     last_items.append(t + 1)
