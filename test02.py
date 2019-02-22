@@ -56,17 +56,20 @@ times = []
 avg_times = []
 max_times = []
 # Running X episodes
-X = 10000
+X = 20000
 for i_episode in range(X):
 
     # Resetting environment
     observation = env.reset()
-    old_state = state_from_space(observation)
+    current_state = state_from_space(observation)
     if i_episode % 1000 == 999:  
         epsilon *= 0.5
         print(f'epsilon={epsilon}')
     if i_episode % 100 == 0:
         print(f'Episode {i_episode}')
+
+    state_actions_taken = {}
+    next_states = {}
 
     # Running through an episode
     for t in range(1000):
@@ -75,38 +78,45 @@ for i_episode in range(X):
 
         # Select action
         
-        for state in old_state:
-            action = max_a(old_state)
+        for state in current_state:
+            action = max_a(current_state)
         if random.random() < epsilon:
             action = env.action_space.sample()
 
         # Perform action, observe reward and new state
         observation, reward, done, info = env.step(action)
-        reward = 1.0 - abs(4.0 * observation[2])
-        # print(f'reward: {reward}')
-        # if not old_state in q:
-            # q[old_state] = dict()
-            # for action in action_space:
-                # q[new_state][action] = 0.0
         new_state = state_from_space(observation)
-        # print(new_state)
-        if not new_state in q:
-            q[new_state] = dict()
-            for action in action_space:
-                q[new_state][action] = 0.0
 
-        # Q-learning equation
-        # print(f'state size: {len(q)}')
-        q[old_state][action] = (1 - alpha) * q[old_state][action] + alpha * (reward + gamma * q[new_state][max_a(new_state)])
-        # print(q[old_state][action])
+        if current_state in state_actions_taken:
+            state_actions_taken[current_state].append(action)
+            next_states[current_state][action] = new_state
+        else:
+            state_actions_taken[current_state] = [action]
+            next_states[current_state] = {}
+            next_states[current_state][action] = new_state
         
         # Updating state
-        old_state = new_state
+        current_state = new_state
 
         # Aborting episode if done
         if done:
             # print(f'Episode finished after {t + 1} timesteps')
             break
+
+    # Q-learning equation
+    reward = t / 200.0
+    for current_state, actions in state_actions_taken.items():
+        for action in actions:
+            new_state = next_states[current_state][action]
+            if not current_state in q:
+                q[current_state] = {}
+                for possible_action in action_space:
+                    q[current_state][possible_action] = 0.0
+            if not new_state in q:
+                q[new_state] = {}
+                for possible_action in action_space:
+                    q[new_state][possible_action] = 0.0
+            q[current_state][action] = (1 - alpha) * q[current_state][action] + alpha * (reward + gamma * q[new_state][max_a(new_state)])
     last_items = times[i_episode - 99:i_episode]
     last_items.append(t + 1)
     # print(f'last_items: {last_items}, list size: {len(last_items)}')
