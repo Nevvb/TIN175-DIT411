@@ -62,12 +62,6 @@ def prob_a(state):
         return random.randint(0, len(action_space) - 1)
 
 def state_from_space(space):
-    # return_array = []
-    # for i in range(3):
-    #     for j in range(3):
-    #         for k in range(3):
-    #             # [1:4] because position is irrelevant
-    #             return_array.append(str((np.rint(1000 * space) - [0, 1, 1, 1] + [0, i, j, k])[1:4].astype(int)))
     return str(np.rint(10 * space)[1:4].astype(int))
 
 # sys.exit()
@@ -99,8 +93,8 @@ for i_episode in range(X):
 
         # Select action
         
-        for state in current_state:
-            action = max_a(current_state)
+        # for state in current_state:
+        action = max_a(current_state)
         if random.random() < epsilon:
             action = env.action_space.sample()
 
