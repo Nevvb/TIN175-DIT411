@@ -18,12 +18,12 @@ actions = env.action_space
 action_space = [0, 1] # TODO Fix (generic) action space
 print("actions: "+str(actions))
 
-epsilon = 0.1   # Epsilon greedy probability
-alpha = 0.5     # Learning rate
+epsilon = 1.0   # Epsilon greedy probability
+alpha = 0.1     # Learning rate
 gamma = 0.5     # Discount factor
 
 def max_a(state):
-    best_reward = -1000000.0
+    best_reward = 0.0
     best_actions = []
     if state in q:
         for action, reward in q[state].items():
@@ -55,6 +55,7 @@ def state_from_space(space):
 times = []
 avg_times = []
 max_times = []
+success_counter = 0
 # Running X episodes
 X = 20000
 for i_episode in range(X):
@@ -127,7 +128,12 @@ for i_episode in range(X):
         print(f'Mean score: {mean}')
     if mean >= 195.0:
         print(f'Success! After {i_episode} episodes')
-        break
+        print(f'Mean score: {mean}')
+        success_counter += 1
+        if success_counter >= 10:
+            break
+    else:
+        success_counter = 0
     avg_times.append(mean)
     max_times.append(np.max(last_items))
 # plt.plot(times)
