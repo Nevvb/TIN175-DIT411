@@ -64,23 +64,31 @@ def prob_a(state):
 def state_from_space(space):
     return str(np.rint(10 * space)[1:4].astype(int))
 
-# sys.exit()
-
+# for plotting
 times = []
 avg_times = []
 max_times = []
+min_times = []
+
+# for stopping
 success_counter = 0
+
+# decides how often we should draw
+draw_interval = 200
+
 # Running X episodes
+
 X = 20000
 for i_episode in range(X):
 
     # Resetting environment
     observation = env.reset()
     current_state = state_from_space(observation)
-    if i_episode % 1000 == 999:  
-        epsilon *= 0.5
+    epsilon = np.exp(-i_episode * 100 / X)
+    if i_episode % draw_interval == 0: # 999:  
+        # epsilon *= 0.5
         print(f'epsilon={epsilon}')
-    if i_episode % 100 == 0:
+    if i_episode % draw_interval == 0:
         print(f'Episode {i_episode}')
 
     state_actions_taken = {}
@@ -88,7 +96,7 @@ for i_episode in range(X):
 
     # Running through an episode
     for t in range(1000):
-        if i_episode % 100 == 0:
+        if i_episode % draw_interval == 0:
             env.render()
 
         # Select action
@@ -138,7 +146,7 @@ for i_episode in range(X):
     # print(f'last_items: {last_items}, list size: {len(last_items)}')
     times.append(t + 1)
     mean = np.mean(last_items)
-    if i_episode % 100 == 0:
+    if i_episode % draw_interval == 0:
         print(f'Episode finished after {t + 1} timesteps')
         print(f'Mean score: {mean}')
     if mean >= 195.0:
