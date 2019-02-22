@@ -135,11 +135,6 @@ for i_episode in range(X):
 
         # Select action
         action = max_a(old_state)
-        # if old_state in q:
-        #     print("in q!")
-        #     action = q[old_state].action
-        # else:
-        #     action = env.action_space.sample()
 
         # Perform action, observe reward and new state
         observation, reward, done, info = env.step(action)
