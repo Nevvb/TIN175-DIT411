@@ -148,6 +148,9 @@ while True:
 
         # Perform action
         observation, reward, done, info = env.step(action)
+        new_state = create_state(observation)
+
+        old_state = new_state
 
         # Aborting episode if done
         if done:
