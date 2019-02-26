@@ -35,10 +35,15 @@ gamma = 1     #Accumulated discount reward
 epsilon = 0.3   #Rate of exploration
 
 #For plotting metrics
-all_epochs = []
+# for plotting
+times = []
+avg_times = []
+max_times = []
+min_times = []
 all_rewards = []
 
-num_episodes = np.power(10, 2)
+#num_episodes = np.power(10, 2)
+num_episodes = 20
 i = 0
 
 for ep in range(num_episodes):
@@ -81,6 +86,16 @@ for ep in range(num_episodes):
             #epsilon = np.maximum(0.1, epsilon * 0.9)
             #print("all rewards {}".format(all_rewards))
             i += 1
+            last_items = times[ep - 99:ep]
+            last_items.append(epochs)
+            times.append(epochs)
+            mean = np.mean(last_items)
+            max_ = np.max(last_items)
+            min_ = np.min(last_items)
+
+            avg_times.append(mean)
+            max_times.append(max_)
+            min_times.append(min_)
             break
 
 print(q_table) 
@@ -98,5 +113,11 @@ with open('test.txt', 'w') as f:
     f.close
 
 plt.plot(all_rewards)
+plt.plot(times)
+plt.plot(avg_times)
+plt.plot(max_times)
+plt.plot(min_times)
+plt.plot([0, len(times)], [195, 195])
 plt.show()
+
 #print(all_rewards)
