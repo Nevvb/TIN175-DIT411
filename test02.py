@@ -10,24 +10,24 @@ from gym import spaces
 
 env = gym.make('CartPole-v0')
 # env = gym.make('MountainCar-v0')
+# env = gym.make('Breakout-v0')
 
 q = dict()
 
 size_up = 10
 actions = env.action_space
 action_space = [0, 1] # TODO Fix (generic) action space
-print("actions: "+str(actions))
 
 epsilon = 1.0   # Epsilon greedy probability
-alpha = 0.2     # Learning rate
-gamma = 0.5     # Discount factor
+alpha = 0.8     # Learning rate
+gamma = 0.4     # Discount factor
 
 def max_a(state):
-    best_reward = -1.0
+    best_reward = None
     best_actions = []
     if state in q:
         for action, reward in q[state].items():
-            if reward > best_reward:
+            if best_reward == None or reward > best_reward:
                 best_actions = [action]
                 best_reward = reward
             elif reward == best_reward:
@@ -46,7 +46,7 @@ def prob_a(state):
         action_probs = {}
         prob_sum = 0
         for action, reward in q[state].items():
-            prob = np.exp(reward)
+            prob = (1 + reward)**8
             action_probs[action] = prob
             prob_sum += prob
         random_prob = random.random() * prob_sum
@@ -63,6 +63,7 @@ def prob_a(state):
 
 def state_from_space(space):
     return str(np.rint(10 * space)[1:4].astype(int))
+    # return str(space)
 
 # for plotting
 times = []
@@ -77,7 +78,7 @@ success_counter = 0
 draw_interval = 200
 
 # Running X episodes
-
+learn_after = True
 X = 20000
 for i_episode in range(X):
 
@@ -85,7 +86,8 @@ for i_episode in range(X):
     observation = env.reset()
     current_state = state_from_space(observation)
     epsilon = np.exp(-i_episode * 100 / X)
-    if i_episode % draw_interval == 0: # 999:  
+    # epsilon = 10 / (10 + i_episode)
+    if i_episode % draw_interval == 0: # 999:
         # epsilon *= 0.5
         print(f'epsilon={epsilon}')
     if i_episode % draw_interval == 0:
@@ -117,7 +119,15 @@ for i_episode in range(X):
             state_actions_taken[current_state] = [action]
             next_states[current_state] = {}
             next_states[current_state][action] = new_state
-        
+        if not learn_after:
+            if not new_state in q:
+                q[new_state] = {}
+                for possible_action in action_space:
+                    q[new_state][possible_action] = 0.0
+            reward = -(observation[2]**2)
+            # print(observation[2], reward)
+            q[current_state][action] = (1 - alpha) * q[current_state][action] + alpha * (reward + gamma * q[new_state][max_a(new_state)])
+
         # Updating state
         current_state = new_state
 
@@ -127,20 +137,22 @@ for i_episode in range(X):
             break
 
     # Q-learning equation
-    reward = ((t + 1) / 200) - 1
-    for current_state, actions in state_actions_taken.items():
-        for action in actions:
-            new_state = next_states[current_state][action]
-            if not current_state in q:
-                q[current_state] = {}
-                for possible_action in action_space:
-                    q[current_state][possible_action] = 0.0
-            if not new_state in q:
-                q[new_state] = {}
-                for possible_action in action_space:
-                    q[new_state][possible_action] = 0.0
-            q[current_state][action] = (1 - alpha) * q[current_state][action] + alpha * ((1 - gamma) * reward + gamma * q[new_state][max_a(new_state)])
-            # q[current_state][action] += reward
+    if learn_after:
+        reward = ((t + 1) / 200) - 1
+        # print(reward)
+        for current_state, actions in state_actions_taken.items():
+            for action in actions:
+                new_state = next_states[current_state][action]
+                if not current_state in q:
+                    q[current_state] = {}
+                    for possible_action in action_space:
+                        q[current_state][possible_action] = 0.0
+                if not new_state in q:
+                    q[new_state] = {}
+                    for possible_action in action_space:
+                        q[new_state][possible_action] = 0.0
+                q[current_state][action] = (1 - alpha) * q[current_state][action] + alpha * (reward + gamma * q[new_state][max_a(new_state)])
+                # q[current_state][action] += reward
     last_items = times[i_episode - 99:i_episode]
     last_items.append(t + 1)
     # print(f'last_items: {last_items}, list size: {len(last_items)}')
@@ -155,7 +167,7 @@ for i_episode in range(X):
         print(f'Success! After {i_episode} episodes')
         print(f'Mean score: {mean}')
         success_counter += 1
-        if success_counter >= 20:
+        if success_counter >= 5:
             break
     else:
         success_counter = 0
