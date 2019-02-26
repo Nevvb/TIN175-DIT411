@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import csv
 import time
+import datetime
 
 print("Gym:", gym.__version__)
 
@@ -43,7 +44,7 @@ max_times = []
 min_times = []
 all_rewards = []
 
-num_episodes = np.power(10, 3)
+num_episodes = np.power(10, 1)
 #num_episodes = 20
 i = 0
 
@@ -113,7 +114,7 @@ with open('test.txt', 'w') as f:
         f.write("%s\n" % item)
     f.close
 
-print("Runtime in seconds", time.process_time())
+print("Runtime:", datetime.timedelta(seconds = time.process_time()))
 plt.plot(all_rewards)
 plt.plot(times)
 plt.plot(avg_times)
