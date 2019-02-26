@@ -129,17 +129,15 @@ for i_episode in range(X):
             state_actions_taken[current_state] = [action]
             next_states[current_state] = {}
             next_states[current_state][action] = new_state
-        if not learn_after:
-            if not new_state in q:
-                q[new_state] = {}
-                for possible_action in action_space:
-                    q[new_state][possible_action] = 0.0
-            # print(observation[2], reward)
-            if done and t < max_timer - 1:
-                if i_episode % draw_interval == 0:
-                    print('BAD')
-                reward = -1000
-            q[current_state][action] = (1 - alpha) * q[current_state][action] + alpha * (reward + gamma * q[new_state][max_a(new_state)])
+        if not new_state in q:
+            q[new_state] = {}
+            for possible_action in action_space:
+                q[new_state][possible_action] = 0.0
+        if done and t < max_timer - 1:
+            if i_episode % draw_interval == 0:
+                print('BAD')
+            reward = -1000
+        q[current_state][action] = (1 - alpha) * q[current_state][action] + alpha * (reward + gamma * q[new_state][max_a(new_state)])
 
         # Updating state
         current_state = new_state
@@ -149,23 +147,6 @@ for i_episode in range(X):
             # print(f'Episode finished after {t + 1} timesteps')
             break
 
-    # Q-learning equation
-    if learn_after:
-        reward = t - max_timer # ((t + 1) / max_timer) - 1
-        # print(reward)
-        for current_state, actions in state_actions_taken.items():
-            for action in actions:
-                new_state = next_states[current_state][action]
-                if not current_state in q:
-                    q[current_state] = {}
-                    for possible_action in action_space:
-                        q[current_state][possible_action] = 0.0
-                if not new_state in q:
-                    q[new_state] = {}
-                    for possible_action in action_space:
-                        q[new_state][possible_action] = 0.0
-                q[current_state][action] = (1 - alpha) * q[current_state][action] + alpha * (reward + gamma * q[new_state][max_a(new_state)])
-                # q[current_state][action] += reward
     last_items = times[i_episode - 99:i_episode]
     last_items.append(t + 1)
     # print(f'last_items: {last_items}, list size: {len(last_items)}')
