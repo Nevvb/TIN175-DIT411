@@ -3,6 +3,7 @@ import random
 import matplotlib.pyplot as plt
 import numpy as np
 import csv
+import time
 
 print("Gym:", gym.__version__)
 
@@ -30,7 +31,7 @@ q_table = np.zeros([env.observation_space.shape[0]*env.observation_space.shape[1
 #print(state)
 
 #Hyperparameters
-alpha = 0.1     #Learning rate
+alpha = 0.7     #Learning rate
 gamma = 1     #Accumulated discount reward
 epsilon = 0.3   #Rate of exploration
 
@@ -42,8 +43,8 @@ max_times = []
 min_times = []
 all_rewards = []
 
-#num_episodes = np.power(10, 2)
-num_episodes = 20
+num_episodes = np.power(10, 3)
+#num_episodes = 20
 i = 0
 
 for ep in range(num_episodes):
@@ -112,6 +113,7 @@ with open('test.txt', 'w') as f:
         f.write("%s\n" % item)
     f.close
 
+print("Runtime in seconds", time.process_time())
 plt.plot(all_rewards)
 plt.plot(times)
 plt.plot(avg_times)
@@ -119,5 +121,6 @@ plt.plot(max_times)
 plt.plot(min_times)
 plt.plot([0, len(times)], [195, 195])
 plt.show()
+
 
 #print(all_rewards)
