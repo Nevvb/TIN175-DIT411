@@ -62,7 +62,12 @@ def prob_a(state):
         return random.randint(0, len(action_space) - 1)
 
 def state_from_space(space):
-    return str(np.rint(10 * space)[1:4].astype(int))
+    inverted = False
+    # if space[2] < 0:
+    #     inverted = True
+    #     space *= -1
+    int_array = np.rint(10 * space)[1:4].astype(int)
+    return str(int_array), inverted
     # return str(space)
 
 # for plotting
@@ -84,7 +89,7 @@ for i_episode in range(X):
 
     # Resetting environment
     observation = env.reset()
-    current_state = state_from_space(observation)
+    current_state, inverted = state_from_space(observation)
     epsilon = np.exp(-i_episode * 100 / X)
     # epsilon = 10 / (10 + i_episode)
     if i_episode % draw_interval == 0: # 999:
@@ -110,7 +115,10 @@ for i_episode in range(X):
 
         # Perform action, observe reward and new state
         observation, reward, done, info = env.step(action)
-        new_state = state_from_space(observation)
+        new_state, inverted = state_from_space(observation)
+        
+        if inverted:
+            action = 1 - action
 
         if current_state in state_actions_taken:
             state_actions_taken[current_state].append(action)
@@ -124,8 +132,11 @@ for i_episode in range(X):
                 q[new_state] = {}
                 for possible_action in action_space:
                     q[new_state][possible_action] = 0.0
-            reward = -(observation[2]**2)
             # print(observation[2], reward)
+            if done and t < 199:
+                if i_episode % draw_interval == 0:
+                    print('BAD')
+                reward = -1000
             q[current_state][action] = (1 - alpha) * q[current_state][action] + alpha * (reward + gamma * q[new_state][max_a(new_state)])
 
         # Updating state
