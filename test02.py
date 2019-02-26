@@ -63,9 +63,9 @@ def prob_a(state):
 
 def state_from_space(space):
     inverted = False
-    # if space[2] < 0:
-    #     inverted = True
-    #     space *= -1
+    if space[2] < 0:
+        inverted = True
+        space *= -1
     int_array = np.rint(10 * space)[1:4].astype(int)
     return str(int_array), inverted
     # return str(space)
@@ -112,13 +112,14 @@ for i_episode in range(X):
         action = max_a(current_state)
         if random.random() < epsilon:
             action = env.action_space.sample()
+        
+        actual_action = action
+        if inverted:
+            actual_action = 1 - action
 
         # Perform action, observe reward and new state
-        observation, reward, done, info = env.step(action)
+        observation, reward, done, info = env.step(actual_action)
         new_state, inverted = state_from_space(observation)
-        
-        if inverted:
-            action = 1 - action
 
         if current_state in state_actions_taken:
             state_actions_taken[current_state].append(action)
