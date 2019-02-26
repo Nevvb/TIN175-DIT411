@@ -86,6 +86,7 @@ draw_interval = 200
 # Running X episodes
 learn_after = False
 X = 20000
+theta_threshold_radians = 12 * 2 * math.pi / 360
 for i_episode in range(X):
 
     # Resetting environment
@@ -135,10 +136,13 @@ for i_episode in range(X):
                 for possible_action in action_space:
                     q[new_state][possible_action] = 0.0
             # print(observation[2], reward)
-            if done and t < max_timer - 1:
-                if i_episode % draw_interval == 0:
-                    print('BAD')
-                reward = -1000
+            if done:
+                if abs(observation[2]) < theta_threshold_radians:
+                    keep_on_trucking = True
+                else:
+                    if i_episode % draw_interval == 0:
+                        print('BAD')
+                    reward = -1000
             q[current_state][action] = (1 - alpha) * q[current_state][action] + alpha * (reward + gamma * q[new_state][max_a(new_state)])
 
         # Updating state
