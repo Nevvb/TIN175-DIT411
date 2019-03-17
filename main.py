@@ -25,6 +25,7 @@ def downSample(img):
 
 def preProcess(img):
     return toGrayscale(downSample(img))
+
 #q_table = np.zeros([env.observation_space.n, env.action_space.n])
 #q_table = [state, env.action_space.n]
 #print(env.observation_space.shape[0]*env.observation_space.shape[1])
@@ -44,7 +45,7 @@ max_times = []
 min_times = []
 all_rewards = []
 
-num_episodes = np.power(10, 5)
+num_episodes = np.power(10, 4)
 #num_episodes = 20
 i = 0
 
