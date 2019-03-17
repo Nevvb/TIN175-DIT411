@@ -15,8 +15,10 @@ env = gym.make('CartPole-v0')
 # env = gym.make('MountainCar-v0')
 # env = gym.make('Breakout-v0')
 
+# Q table
 q = dict()
 
+# Setting up parameters
 size_up = 10
 actions = env.action_space
 action_space = [0, 1] # TODO Fix (generic) action space
@@ -26,9 +28,11 @@ epsilon = 1.0   # Epsilon greedy probability
 alpha = 0.8     # Learning rate
 gamma = 0.4     # Discount factor
 
+# Finding the best action to take, given a certain state
 def max_a(state):
     best_reward = None
     best_actions = []
+    # If state has been visited before, choose an action with best reward:
     if state in q:
         for action, reward in q[state].items():
             if best_reward == None or reward > best_reward:
@@ -37,34 +41,15 @@ def max_a(state):
             elif reward == best_reward:
                 best_actions.append(action)
         action_chosen = random.randint(0, len(best_actions) - 1)
-        # print(f'action chosen: {best_actions[action_chosen]}')
         return best_actions[action_chosen]
+    # If state has never been visited, chose an ation by random:
     else:
         q[state] = dict()
         for action in action_space:
             q[state][action] = 0.0
         return random.randint(0, len(action_space) - 1)
 
-def prob_a(state):
-    if state in q:
-        action_probs = {}
-        prob_sum = 0
-        for action, reward in q[state].items():
-            prob = (1 + reward)**8
-            action_probs[action] = prob
-            prob_sum += prob
-        random_prob = random.random() * prob_sum
-        for action, prob in action_probs.items():
-            random_prob -= prob
-            if random_prob <= 0:
-                return action
-        return -1 # something went wrong here
-    else:
-        q[state] = dict()
-        for action in action_space:
-            q[state][action] = 0.0
-        return random.randint(0, len(action_space) - 1)
-
+# Converts space to workable state
 def state_from_space(space):
     inverted = False
     if space[2] < 0:
@@ -72,9 +57,8 @@ def state_from_space(space):
         space *= -1
     int_array = np.rint(10 * space)[1:4].astype(int)
     return str(int_array), inverted
-    # return str(space)
 
-# for plotting
+# For plotting
 times = []
 avg_times = []
 max_times = []
@@ -82,10 +66,10 @@ min_times = []
 mega_time = 600
 success_threshold = 195
 
-# for stopping
+# For stopping when algorithm has succeeded
 success_counter = 0
 
-# decides how often we should draw
+# Decides how often we should draw
 draw_interval = 200
 
 # Running X episodes
@@ -97,11 +81,8 @@ for i_episode in range(X):
     observation = env.reset()
     current_state, inverted = state_from_space(observation)
     epsilon = np.exp(-i_episode * 100 / X)
-    # epsilon = 10 / (10 + i_episode)
     if i_episode % draw_interval == 0:
-        # epsilon *= 0.5
         print(f'epsilon={epsilon}')
-    if i_episode % draw_interval == 0:
         print(f'Episode {i_episode}')
 
     state_actions_taken = {}
@@ -110,12 +91,11 @@ for i_episode in range(X):
 
     # Running through an episode
     for t in range(mega_time):
+        # Only render at a certain interval
         if i_episode % draw_interval == 0:
             env.render()
 
         # Select action
-        
-        # for state in current_state:
         action = max_a(current_state)
         if random.random() < epsilon:
             action = env.action_space.sample()
@@ -132,6 +112,8 @@ for i_episode in range(X):
             q[new_state] = {}
             for possible_action in action_space:
                 q[new_state][possible_action] = 0.0
+
+        # Performing Q-equation
         if done and t < max_timer - 1:
             if i_episode % draw_interval == 0:
                 print('BAD')
@@ -145,12 +127,12 @@ for i_episode in range(X):
 
         # Aborting episode if done
         if done:
-            # print(f'Episode finished after {t + 1} timesteps')
             break
 
+    # Logging results after an episode, and printing episode-specific results
     times.append(t + 1 - iterations_to_ignore)
     last_items = times[i_episode - 99:i_episode+1]
-    # print(f'last_items: {last_items}, list size: {len(last_items)}')
+
     mean = np.mean(last_items)
     max_ = np.max(last_items)
     min_ = np.min(last_items)
@@ -170,7 +152,8 @@ for i_episode in range(X):
     avg_times.append(mean)
     max_times.append(max_)
     min_times.append(min_)
-# plt.plot(times)
+
+# Plotting results
 plt.plot(avg_times)
 plt.plot(max_times)
 plt.plot(min_times)
