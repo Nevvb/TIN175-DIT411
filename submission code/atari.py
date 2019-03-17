@@ -2,7 +2,6 @@ import gym
 import random
 import matplotlib.pyplot as plt
 import numpy as np
-import csv
 import time
 import datetime
 
@@ -110,18 +109,6 @@ for ep in range(num_episodes):
 
 # - Printing and saving results for debugging
 print(q_table) 
-with open('test.csv', 'w') as fp:
-    for row in q_table:
-        for item in row:
-            fp.write("%s" % item)
-            fp.write(",")
-        fp.write("\n")
-    fp.close    
-
-with open('test.txt', 'w') as f:
-    for item in all_rewards:
-        f.write("%s\n" % item)
-    f.close
 
 # Showing results in a plot
 print("Runtime:", datetime.timedelta(seconds = time.process_time()))

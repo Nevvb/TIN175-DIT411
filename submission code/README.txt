@@ -27,7 +27,6 @@ Packages needed:
     random
     matplotlib
     numpy
-    csv
     time
     datetime
 Run:
