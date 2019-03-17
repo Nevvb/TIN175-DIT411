@@ -79,13 +79,8 @@ times = []
 avg_times = []
 max_times = []
 min_times = []
-mega = False
 mega_time = 600
-if mega:
-    mega_times = []
-    mega_avg_times = []
-    mega_max_times = []
-    mega_min_times = []
+success_threshold = 195
 
 # for stopping
 success_counter = 0
@@ -150,37 +145,22 @@ for i_episode in range(X):
 
         # Aborting episode if done
         if done:
-            if mega and abs(observation[2]) < theta_threshold_radians:
-                iterations_to_ignore += 1
-            else:
-            	# print(f'Episode finished after {t + 1} timesteps')
-            	break
+            # print(f'Episode finished after {t + 1} timesteps')
+            break
 
     times.append(t + 1 - iterations_to_ignore)
-    if mega:
-        mega_times.append(t + 1)
     last_items = times[i_episode - 99:i_episode+1]
-    if mega:
-        mega_last_items = mega_times[i_episode - 99:i_episode+1]
     # print(f'last_items: {last_items}, list size: {len(last_items)}')
     mean = np.mean(last_items)
     max_ = np.max(last_items)
     min_ = np.min(last_items)
-    if mega:
-        mega_mean = np.mean(mega_last_items)
-        mega_max_ = np.max(mega_last_items)
-        mega_min_ = np.min(mega_last_items)
     if i_episode % draw_interval == 0:
         print(f'Episode finished after {t + 1} timesteps')
         print(f'Mean score: {mean}')
-        if mega:
-            print(f'Mega mean score: {mega_mean}')
         print(f'q size: {len(q)}')
-    if (mega and mega_mean >= mega_time - 5) or (not mega and mean >= 195):
+    if mean >= success_threshold:
         print(f'Success! After {i_episode} episodes')
         print(f'Mean score: {mean}')
-        if mega:
-            print(f'Mega mean score: {mega_mean}')
         print(f'q size: {len(q)}')
         success_counter += 1
         if success_counter >= 5:
@@ -190,18 +170,11 @@ for i_episode in range(X):
     avg_times.append(mean)
     max_times.append(max_)
     min_times.append(min_)
-    if mega:
-        mega_avg_times.append(mega_mean)
-        mega_max_times.append(mega_max_)
-        mega_min_times.append(mega_min_)
 # plt.plot(times)
 plt.plot(avg_times)
 plt.plot(max_times)
 plt.plot(min_times)
-if mega:
-    # plt.plot(mega_times)
-    plt.plot(mega_avg_times)
-    plt.plot(mega_max_times)
-    plt.plot(mega_min_times)
-plt.plot([0, len(times)], [195, 195])
+plt.plot([0, len(times)], [success_threshold, success_threshold])
+plt.legend(['Mean score', 'Max score', 'Min score', 'Success threshold'])
+plt.title('Moving average, max and min scores over last 100 runs')
 plt.show()
