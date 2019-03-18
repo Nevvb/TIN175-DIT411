@@ -40,6 +40,9 @@ max_times = []
 min_times = []
 all_rewards = []
 
+# - Decides how often we should draw
+draw_interval = 50
+
 # - How many episodes to run
 num_episodes = np.power(10, 4)
 #num_episodes = 20
@@ -81,7 +84,7 @@ for ep in range(num_episodes):
         state = next_state
 
         # - Only render every 20th episode, for speed
-        if i % 20 == 0:
+        if i % draw_interval == 0:
             env.render()
 
         epochs += 1
@@ -119,6 +122,7 @@ plt.plot(avg_times)
 plt.plot(max_times)
 plt.plot(min_times)
 plt.plot([0, len(times)], [195, 195])
+<<<<<<< HEAD
 plt.legend(['Average times', 'Max times', 'Min times'])
 plt.show()
 
