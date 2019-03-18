@@ -95,9 +95,10 @@ for ep in range(num_episodes):
 
             # - Logging for result and plots later
             all_rewards.append(tot_reward)
-            last_items = times[ep - 99:ep]
-            last_items.append(epochs)
             times.append(epochs)
+            last_items = times[ep - 99:ep + 1]
+            #last_items.append(epochs)
+            
             mean = np.mean(last_items)
             max_ = np.max(last_items)
             min_ = np.min(last_items)
@@ -112,13 +113,14 @@ print(q_table)
 
 # Showing results in a plot
 print("Runtime:", datetime.timedelta(seconds = time.process_time()))
-plt.plot(all_rewards)
-plt.plot(times)
+#plt.plot(all_rewards)
+#plt.plot(times)
 plt.plot(avg_times)
 plt.plot(max_times)
 plt.plot(min_times)
 plt.plot([0, len(times)], [195, 195])
+plt.legend(['Average times', 'Max times', 'Min times'])
 plt.show()
 
 
-#print(all_rewards)
+print(all_rewards)
